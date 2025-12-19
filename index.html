@@ -1,1 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Se Atualiza Aí</title>
+
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #faf9f6;
+      color: #1a1a1a;
+      max-width: 800px;
+      margin: auto;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      text-align: center;
+      color: #555;
+      margin-bottom: 2rem;
+    }
+
+    textarea, input {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.9rem;
+      font-size: 1rem;
+      font-weight: bold;
+      background: #000;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .loading {
+      text-align: center;
+      margin-top: 1rem;
+      font-style: italic;
+    }
+
+    pre {
+      background: #fff;
+      padding: 1rem;
+      margin-top: 2rem;
+      white-space: pre-wrap;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 0.85rem;
+      color: #777;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Se Atualiza Aí</h1>
+  <p class="subtitle">
+    Análise de notícias com discernimento bíblico
+  </p>
+
+  <textarea id="texto" placeholder="Cole aqui o texto da notícia (opcional)"></textarea>
+
+  <input id="link" type="url" placeholder="Ou cole o link da notícia (opcional)" />
+
+  <input id="imagem" type="file" accept="image/*" />
+
+  <button onclick="analisar()">Analisar biblicamente</button>
+
+  <div id="loading" class="loading" style="display:none;">
+    Analisando com base bíblica...
+  </div>
+
+  <pre id="resultado"></pre>
+
+  <footer>
+    © 2025 • Se Atualiza Aí
+  </footer>
+
+  <script>
+    async function analisar() {
+      const texto = document.getElementById("texto").value;
+      const link = document.getElementById("link").value;
+      const imagem = document.getElementById("imagem").files[0];
+      const resultado = document.getElementById("resultado");
+      const loading = document.getElementById("loading");
+
+      resultado.textContent = "";
+      loading.style.display = "block";
+
+      const formData = new FormData();
+      if (texto) formData.append("texto", texto);
+      if (link) formData.append("link", link);
+      if (imagem) formData.append("imagem", imagem);
+
+      try {
+        const res = await fetch(
+          "https://se-atualiza-ai.onrender.com/analisar",
+          {
+            method: "POST",
+            body: formData
+          }
+        );
+
+        const data = await res.json();
+        resultado.textContent = data.resultado || "Nenhuma resposta recebida.";
+      } catch (err) {
+        resultado.textContent = "Erro ao conectar com o servidor.";
+      } finally {
+        loading.style.display = "none";
+      }
+    }
+  </script>
+
+</body>
+</html>
 
