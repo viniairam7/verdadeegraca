@@ -3,21 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Se Atualiza Aí</title>
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <title>Verdade & Graça</title>
+  <meta name="theme-color" content="#2f2f2d" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192.png" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg: #f9f6f1;
-      --paper: #ffffff;
-      --text: #1c1c1c;
-      --muted: #555;
-      --accent: #000;
-      --radius: 12px;
+      --bg: #2f2f2d;
+      --card: #3a3a38;
+      --gold: #d6b87c;
+      --text: #f5f5f5;
+      --muted: #bdbdbd;
     }
 
     * {
@@ -27,173 +30,207 @@
     body {
       margin: 0;
       background: var(--bg);
+      font-family: Inter, sans-serif;
       color: var(--text);
-      font-family: 'Inter', sans-serif;
     }
 
     header {
-      padding: 2.5rem 1.5rem 2rem;
+      padding: 1.2rem;
       text-align: center;
+      border-bottom: 1px solid #444;
     }
 
     header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.2rem;
-      margin-bottom: 0.5rem;
+      font-family: "Playfair Display", serif;
+      font-size: 1.6rem;
+      color: var(--gold);
+      margin: 0;
     }
 
     header p {
+      margin-top: 0.3rem;
+      font-size: 0.85rem;
       color: var(--muted);
-      font-size: 1rem;
     }
 
-    main {
+    .chat {
       padding: 1rem;
       max-width: 720px;
       margin: auto;
     }
 
-    .card {
-      background: var(--paper);
-      border-radius: var(--radius);
-      padding: 1.25rem;
-      margin-bottom: 1.25rem;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+    .msg {
+      max-width: 85%;
+      padding: 0.9rem 1rem;
+      border-radius: 14px;
+      margin-bottom: 0.8rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      word-wrap: break-word;
     }
 
-    .card h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
-      margin-bottom: 0.75rem;
+    .user {
+      background: var(--gold);
+      color: #1c1c1c;
+      margin-left: auto;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bot {
+      background: var(--card);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+
+    .copy-btn {
+      margin-top: 0.6rem;
+      font-size: 0.75rem;
+      color: var(--gold);
+      cursor: pointer;
+    }
+
+    .input-box {
+      position: sticky;
+      bottom: 0;
+      background: var(--bg);
+      padding: 1rem;
+      border-top: 1px solid #444;
     }
 
     textarea {
       width: 100%;
-      min-height: 160px;
-      resize: vertical;
-      padding: 1rem;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      font-family: 'Inter', sans-serif;
+      resize: none;
+      height: 70px;
+      border-radius: 12px;
+      padding: 0.75rem;
+      font-size: 0.9rem;
+      background: #1f1f1f;
+      color: var(--text);
+      border: 1px solid #555;
     }
 
-    input[type="file"] {
-      width: 100%;
-      font-size: 0.95rem;
+    textarea::placeholder {
+      color: #aaa;
     }
 
     button {
       width: 100%;
-      padding: 1rem;
-      font-size: 1.05rem;
-      font-weight: 600;
-      background: var(--accent);
-      color: #fff;
+      margin-top: 0.6rem;
+      padding: 0.75rem;
+      background: var(--gold);
+      color: #1c1c1c;
       border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 0.5rem;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-    }
-
-    .loading {
-      text-align: center;
-      font-style: italic;
-      color: var(--muted);
-      margin-top: 1rem;
-    }
-
-    .resultado {
-      white-space: pre-wrap;
-      line-height: 1.6;
+      border-radius: 10px;
+      font-weight: 600;
       font-size: 0.95rem;
+      cursor: pointer;
     }
 
     footer {
-      text-align: center;
-      padding: 2rem 1rem;
-      font-size: 0.8rem;
-      color: #777;
+      padding: 1.2rem;
+      background: #1f1f1f;
+      margin-top: 2rem;
     }
 
-    /* Desktop enhancement */
-    @media (min-width: 768px) {
-      header h1 {
-        font-size: 2.8rem;
-      }
+    footer h3 {
+      font-size: 1rem;
+      margin-bottom: 0.8rem;
+      color: var(--gold);
+    }
+
+    .news {
+      font-size: 0.85rem;
+      background: #2a2a28;
+      padding: 0.7rem;
+      border-radius: 10px;
+      margin-bottom: 0.6rem;
+      line-height: 1.4;
+    }
+
+    .news strong {
+      color: var(--gold);
     }
   </style>
 </head>
 
 <body>
 
-  <header>
-    <h1>Se Atualiza Aí</h1>
-    <p>Análise de notícias à luz da Palavra</p>
-  </header>
+<header>
+  <h1>Verdade & Graça</h1>
+  <p>Analisando o mundo à luz da Palavra</p>
+</header>
 
-  <main>
+<div id="chat" class="chat">
+  <div class="msg bot">
+    👋 Olá!  
+    Envie uma manchete, um tema atual ou uma dúvida bíblica.
+    Aqui buscamos **verdade factual** e **discernimento cristão**.
+  </div>
+</div>
 
-    <div class="card">
-      <h2>Texto da notícia</h2>
-      <textarea id="texto" placeholder="Cole aqui o texto da notícia que você deseja analisar..."></textarea>
-    </div>
+<div class="input-box">
+  <textarea id="input" placeholder="Não achou alguma notícia específica? Coloque a manchete aqui ou tire dúvidas bíblicas sobre o Antigo e Novo Testamento."></textarea>
+  <button onclick="enviar()">Enviar</button>
+</div>
 
-    <div class="card">
-      <h2>Ou envie um print</h2>
-      <input id="imagem" type="file" accept="image/*" />
-    </div>
+<footer>
+  <h3>📰 Assuntos mais falados do dia</h3>
+  <div id="trending"></div>
+</footer>
 
-    <button onclick="analisar()">Analisar biblicamente</button>
+<script>
+  async function enviar() {
+    const input = document.getElementById("input");
+    const chat = document.getElementById("chat");
+    const texto = input.value.trim();
 
-    <div id="loading" class="loading" style="display:none;">
-      Analisando com discernimento bíblico...
-    </div>
+    if (!texto) return;
 
-    <div id="resultado" class="card resultado" style="display:none;"></div>
+    chat.innerHTML += `<div class="msg user">${texto}</div>`;
+    input.value = "";
 
-  </main>
+    const res = await fetch("https://se-atualiza-ai.onrender.com/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mensagem: texto })
+    });
 
-  <footer>
-    © 2025 • Se Atualiza Aí
-  </footer>
+    const data = await res.json();
 
-  <script>
-    async function analisar() {
-      const texto = document.getElementById("texto").value;
-      const imagem = document.getElementById("imagem").files[0];
-      const resultado = document.getElementById("resultado");
-      const loading = document.getElementById("loading");
+    const botMsg = document.createElement("div");
+    botMsg.className = "msg bot";
+    botMsg.innerHTML = `
+      ${data.resposta}
+      <div class="copy-btn" onclick="navigator.clipboard.writeText(\`${data.resposta}\`)">
+        📋 Copiar resposta
+      </div>
+    `;
+    chat.appendChild(botMsg);
+    chat.scrollTop = chat.scrollHeight;
+  }
 
-      resultado.style.display = "none";
-      resultado.textContent = "";
-      loading.style.display = "block";
+  async function carregarTrending() {
+    const res = await fetch("https://se-atualiza-ai.onrender.com/trending");
+    const data = await res.json();
 
-      const formData = new FormData();
-      if (texto) formData.append("texto", texto);
-      if (imagem) formData.append("imagem", imagem);
+    const div = document.getElementById("trending");
+    data.noticias.forEach(n => {
+      div.innerHTML += `
+        <div class="news">
+          <strong>${n.titulo}</strong><br/>
+          ${n.categoria} • ${n.status} • Relevância ${n.relevancia}<br/>
+          📖 ${n.biblico}
+        </div>
+      `;
+    });
+  }
 
-      try {
-        const res = await fetch("https://se-atualiza-ai.onrender.com/analisar", {
-          method: "POST",
-          body: formData
-        });
+  carregarTrending();
 
-        const data = await res.json();
-        resultado.textContent = data.resultado || "Nenhuma análise retornada.";
-        resultado.style.display = "block";
-      } catch (err) {
-        resultado.textContent = "Erro ao conectar com o servidor.";
-        resultado.style.display = "block";
-      } finally {
-        loading.style.display = "none";
-      }
-    }
-  </script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js");
+  }
+</script>
 
 </body>
 </html>
