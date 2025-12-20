@@ -1,0 +1,19 @@
+{
+  "name": "verdade-e-graca-backend",
+  "version": "1.0.0",
+  "description": "Backend do projeto Verdade & Graça - análise factual e bíblica de notícias",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2"
+  }
+}
