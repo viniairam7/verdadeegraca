@@ -5,186 +5,222 @@
   <title>Verdade & Graça</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Estilo -->
+  <!-- PWA -->
+  <meta name="theme-color" content="#121212">
+
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: "Georgia", serif;
-      background: #2b2b2b;
-      color: #eaeaea;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+      background: #121212;
+      color: #f5f5f5;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      height: 100vh;
     }
 
-    .container {
-      max-width: 720px;
-      width: 100%;
-      padding: 40px 20px;
+    header {
+      padding: 14px;
+      text-align: center;
+      font-weight: bold;
+      background: #1e1e1e;
+      border-bottom: 1px solid #333;
+      font-size: 1.1rem;
     }
 
-    h1 {
-      color: #d4b26a;
-      margin-bottom: 4px;
+    #chat {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    h2 {
-      margin-top: 40px;
-      color: #d4b26a;
+    .msg {
+      max-width: 80%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      line-height: 1.4;
+      white-space: pre-wrap;
     }
 
-    .subtitle {
-      opacity: 0.8;
-      margin-bottom: 30px;
+    .user {
+      align-self: flex-end;
+      background: #2563eb;
     }
 
-    .box {
-      background: #3a3a3a;
-      padding: 16px;
-      border-radius: 12px;
-      margin-bottom: 16px;
+    .bot {
+      align-self: flex-start;
+      background: #2a2a2a;
+      position: relative;
+    }
+
+    .copy-btn {
+      position: absolute;
+      bottom: -18px;
+      right: 10px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+
+    .copy-btn:hover { opacity: 1; }
+
+    footer {
+      padding: 10px;
+      border-top: 1px solid #333;
+      background: #1e1e1e;
+      display: flex;
+      gap: 8px;
     }
 
     textarea {
-      width: 100%;
-      min-height: 80px;
-      padding: 12px;
+      flex: 1;
+      resize: none;
+      padding: 10px;
       border-radius: 10px;
       border: none;
-      resize: vertical;
-      font-size: 16px;
-      background: #1f1f1f;
-      color: #fff;
+      outline: none;
+      font-size: 0.9rem;
     }
 
     button {
-      width: 100%;
-      margin-top: 12px;
-      padding: 14px;
-      border-radius: 12px;
+      background: #22c55e;
       border: none;
-      background: #d4b26a;
-      font-size: 16px;
+      border-radius: 10px;
+      padding: 0 16px;
       font-weight: bold;
       cursor: pointer;
     }
 
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .news {
-      background: #1f1f1f;
+    #news {
       padding: 16px;
+      background: #0f0f0f;
+      border-top: 1px solid #333;
+    }
+
+    .news-card {
+      border: 1px solid #333;
       border-radius: 12px;
-      margin-bottom: 14px;
+      padding: 12px;
+      margin-bottom: 12px;
+      background: #181818;
     }
 
-    .news h3 {
-      margin-top: 0;
-      color: #d4b26a;
+    .news-title {
+      font-weight: bold;
+      margin-bottom: 6px;
     }
 
-    .news p {
-      margin: 6px 0;
-      line-height: 1.5;
-    }
-
-    .bible {
-      font-style: italic;
-      opacity: 0.9;
-      margin-top: 10px;
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 40px;
-      opacity: 0.6;
-      font-size: 14px;
+    .tag {
+      display: inline-block;
+      background: #333;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 0.7rem;
+      margin-right: 5px;
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <h1>Verdade & Graça</h1>
-    <div class="subtitle">Analisando o mundo à luz da Palavra</div>
 
-    <div class="box">
-      👋 <strong>Olá!</strong> Não achou algo específico? Envie uma manchete, um tema atual ou uma dúvida bíblica.
-      Aqui buscamos <strong>verdade factual</strong> e <strong>discernimento cristão</strong>.
-    </div>
+<header>📖 Verdade & Graça</header>
 
-    <textarea id="input" placeholder="Digite aqui sua manchete, tema ou pergunta bíblica..."></textarea>
-    <button id="sendBtn">Enviar</button>
+<section id="chat"></section>
 
-    <h2>📰 Assuntos mais falados de hoje</h2>
-    <div id="newsContainer"></div>
+<footer>
+  <textarea id="input" rows="2"
+    placeholder="Não achou uma notícia específica? Digite a manchete ou tire dúvidas bíblicas..."></textarea>
+  <button onclick="send()">Enviar</button>
+</footer>
 
-    <footer>
-      © Verdade & Graça — Tudo deve ser examinado à luz da Palavra (1Ts 5:21)
-    </footer>
-  </div>
+<section id="news">
+  <h3>📰 Notícias do Dia</h3>
+  <div id="news-list">Carregando notícias...</div>
+</section>
 
-  <!-- Script -->
-  <script>
-    const API_URL = "https://verdadeegraca.onrender.com";
+<script>
+  const chat = document.getElementById("chat");
+  const input = document.getElementById("input");
 
-    const input = document.getElementById("input");
-    const button = document.getElementById("sendBtn");
-    const newsContainer = document.getElementById("newsContainer");
+  const messages = [
+    {
+      role: "system",
+      content: "Você é um analista cristão imparcial. Responda com verdade factual e reflexão bíblica equilibrada."
+    }
+  ];
 
-    async function carregarNoticias() {
-      newsContainer.innerHTML = "⏳ Carregando notícias...";
-      try {
-        const res = await fetch(`${API_URL}/api/noticias`);
-        const data = await res.json();
+  function addMessage(text, cls, copy=false) {
+    const div = document.createElement("div");
+    div.className = `msg ${cls}`;
+    div.textContent = text;
 
-        newsContainer.innerHTML = "";
-
-        data.forEach(noticia => {
-          const div = document.createElement("div");
-          div.className = "news";
-          div.innerHTML = `
-            <h3>${noticia.titulo}</h3>
-            <p><strong>Análise:</strong> ${noticia.analise}</p>
-            <p class="bible">📖 ${noticia.reflexaoBiblica}</p>
-          `;
-          newsContainer.appendChild(div);
-        });
-
-      } catch (err) {
-        newsContainer.innerHTML = "❌ Erro ao carregar notícias.";
-      }
+    if (copy) {
+      const btn = document.createElement("div");
+      btn.className = "copy-btn";
+      btn.textContent = "📋 Copiar";
+      btn.onclick = () => navigator.clipboard.writeText(text);
+      div.appendChild(btn);
     }
 
-    button.addEventListener("click", async () => {
-      const texto = input.value.trim();
-      if (!texto) return;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }
 
-      button.disabled = true;
-      button.textContent = "Enviando...";
+  async function send() {
+    const text = input.value.trim();
+    if (!text) return;
 
-      try {
-        await fetch(`${API_URL}/api/pergunta`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ texto })
-        });
+    input.value = "";
+    addMessage(text, "user");
+    messages.push({ role: "user", content: text });
 
-        input.value = "";
-        carregarNoticias();
+    const loading = document.createElement("div");
+    loading.className = "msg bot";
+    loading.textContent = "Digitando...";
+    chat.appendChild(loading);
 
-      } catch (err) {
-        alert("Erro ao enviar. Tente novamente.");
-      } finally {
-        button.disabled = false;
-        button.textContent = "Enviar";
-      }
+    const res = await fetch("https://verdadeegraca.onrender.com/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages })
     });
 
-    carregarNoticias();
-  </script>
+    const data = await res.json();
+    chat.removeChild(loading);
+
+    messages.push(data);
+    addMessage(data.content, "bot", true);
+  }
+
+  async function loadNews() {
+    const res = await fetch("https://verdadeegraca.onrender.com/api/noticias");
+    const news = await res.json();
+
+    const list = document.getElementById("news-list");
+    list.innerHTML = "";
+
+    news.forEach(n => {
+      const card = document.createElement("div");
+      card.className = "news-card";
+      card.innerHTML = `
+        <div class="news-title">${n.titulo}</div>
+        <p>${n.resumo}</p>
+        <div>
+          <span class="tag">Relevância: ${n.relevancia}</span>
+          <span class="tag">Veracidade: ${n.veracidade}</span>
+        </div>
+        <p><strong>Reflexão Bíblica:</strong> ${n.reflexao_biblica}</p>
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  loadNews();
+</script>
+
 </body>
 </html>
-
