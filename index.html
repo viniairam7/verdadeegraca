@@ -4,161 +4,236 @@
   <meta charset="UTF-8" />
   <title>Verdade & Graça</title>
 
+  <!-- Mobile First -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+
+  <!-- Meta -->
+  <meta name="theme-color" content="#0e0e0e" />
+  <meta name="description" content="Analisando o mundo à luz da Palavra." />
+
   <style>
+    /* RESET */
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
-      background: #1b1b1b;
-      color: #e6d3a3;
-      font-family: "Georgia", serif;
       margin: 0;
-      padding: 0;
-    }
-
-    h1 {
-      text-align: center;
-      margin-top: 40px;
-    }
-
-    .subtitle {
-      text-align: center;
-      color: #c9b27c;
-      margin-bottom: 30px;
-    }
-
-    .chat-box {
-      width: 80%;
-      margin: auto;
-      background: #2a2a2a;
-      padding: 20px;
-      border-radius: 10px;
-      min-height: 200px;
-    }
-
-    .msg-user {
-      background: #3a3a3a;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-    }
-
-    .msg-ai {
-      background: #1f1f1f;
-      border-left: 4px solid #d6b36a;
-      padding: 10px;
-      margin-bottom: 15px;
-    }
-
-    .copy-btn {
-      color: #d6b36a;
-      cursor: pointer;
-      font-size: 14px;
-      margin-top: 5px;
-    }
-
-    .input-area {
-      width: 80%;
-      margin: 20px auto;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(180deg, #141414, #0a0a0a);
+      color: #f1f1f1;
+      min-height: 100vh;
       display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      padding: 20px 16px 10px;
+      text-align: center;
+    }
+
+    header h1 {
+      color: #d4af37;
+      font-size: 1.9rem;
+      margin: 0;
+    }
+
+    header p {
+      margin: 6px 0 0;
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    /* BUTTONS */
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr;
       gap: 10px;
+      padding: 16px;
+    }
+
+    .actions button {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 0.95rem;
+      color: #d4af37;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .actions button:active {
+      background: #2c2c2c;
+    }
+
+    /* CHAT */
+    .chat {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .bubble {
+      margin-bottom: 14px;
+      max-width: 92%;
+      line-height: 1.5;
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+    }
+
+    .user {
+      margin-left: auto;
+      background: #24364d;
+      border-radius: 14px 14px 4px 14px;
+      padding: 12px;
+    }
+
+    .bot {
+      margin-right: auto;
+      background: #1a1a1a;
+      border-left: 3px solid #d4af37;
+      border-radius: 14px 14px 14px 4px;
+      padding: 12px;
+    }
+
+    .copy {
+      font-size: 0.75rem;
+      color: #d4af37;
+      margin-top: 6px;
+      text-align: right;
+      cursor: pointer;
+    }
+
+    /* INPUT */
+    .input-area {
+      padding: 10px;
+      background: #0e0e0e;
+      display: flex;
+      gap: 8px;
+      border-top: 1px solid #222;
     }
 
     textarea {
       flex: 1;
+      resize: none;
       padding: 12px;
-      border-radius: 8px;
+      border-radius: 14px;
       border: none;
-      font-size: 16px;
+      font-size: 0.95rem;
     }
 
-    button {
-      background: #d6b36a;
+    button.send {
+      background: #d4af37;
       border: none;
-      padding: 12px 20px;
+      border-radius: 14px;
+      padding: 0 18px;
       font-weight: bold;
-      border-radius: 8px;
       cursor: pointer;
     }
 
-    .news {
-      width: 80%;
-      margin: 40px auto;
+    button.send:active {
+      opacity: 0.85;
     }
 
-    footer {
-      text-align: center;
-      margin: 40px 0;
-      color: #aaa;
-      font-size: 14px;
+    /* DESKTOP UPGRADE */
+    @media (min-width: 768px) {
+      body {
+        background: radial-gradient(circle at top, #1f1f1f, #0e0e0e);
+      }
+
+      .actions {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 900px;
+        margin: auto;
+      }
+
+      .chat {
+        max-width: 900px;
+        margin: auto;
+      }
+
+      .input-area {
+        max-width: 900px;
+        margin: auto;
+      }
     }
   </style>
 </head>
 <body>
 
+<header>
   <h1>Verdade & Graça</h1>
-  <div class="subtitle">
-    Analisando o mundo à luz da Palavra (1Ts 5:21)
-  </div>
+  <p>Tudo deve ser examinado à luz da Palavra</p>
+</header>
 
-  <div id="chat" class="chat-box"></div>
+<div class="actions">
+  <button onclick="sendPreset('Me atualize com as principais notícias do dia, de forma imparcial, com discernimento bíblico.')">
+    📰 Notícias do dia
+  </button>
 
-  <div class="input-area">
-    <textarea id="input" placeholder="Não achou alguma notícia específica? Digite a manchete ou tire dúvidas bíblicas."></textarea>
-    <button onclick="send()">Enviar</button>
-  </div>
+  <button onclick="sendPreset('Crie uma devocional cristã para o dia de hoje, com introdução, desenvolvimento e conclusão.')">
+    📖 Devocional de hoje
+  </button>
 
-  <div class="news">
-    <h2>📰 Notícias do Dia</h2>
-    <div id="news-content">Carregando...</div>
-  </div>
+  <button onclick="sendPreset('Explique como Jesus agiria hoje em relação a dinheiro, trabalho, estudos e relacionamentos.')">
+    ✝️ O que Jesus faria?
+  </button>
+</div>
 
-  <footer>
-    © Verdade & Graça — Tudo deve ser examinado à luz da Palavra
-  </footer>
+<div class="chat" id="chat"></div>
 
-  <script>
-    const API = "https://verdadeegraca.onrender.com";
+<div class="input-area">
+  <textarea id="input" rows="2" placeholder="Digite sua dúvida bíblica..."></textarea>
+  <button class="send" onclick="sendMessage()">Enviar</button>
+</div>
 
-    function addMessage(text, type) {
-      const div = document.createElement("div");
-      div.className = type === "user" ? "msg-user" : "msg-ai";
-      div.innerText = text;
+<script>
+  const API_URL = "https://verdadeegraca.onrender.com/api/chat";
+  const chat = document.getElementById("chat");
+  const input = document.getElementById("input");
 
-      if (type === "ai") {
-        const copy = document.createElement("div");
-        copy.className = "copy-btn";
-        copy.innerText = "📋 Copiar resposta";
-        copy.onclick = () => navigator.clipboard.writeText(text);
-        div.appendChild(copy);
-      }
+  function addBubble(text, type) {
+    const bubble = document.createElement("div");
+    bubble.className = `bubble ${type}`;
+    bubble.textContent = text;
+    chat.appendChild(bubble);
 
-      document.getElementById("chat").appendChild(div);
+    if (type === "bot") {
+      const copy = document.createElement("div");
+      copy.className = "copy";
+      copy.textContent = "📋 Copiar";
+      copy.onclick = () => navigator.clipboard.writeText(text);
+      bubble.appendChild(copy);
     }
 
-    async function send() {
-      const input = document.getElementById("input");
-      const text = input.value.trim();
-      if (!text) return;
+    chat.scrollTop = chat.scrollHeight;
+  }
 
-      addMessage(text, "user");
-      input.value = "";
+  async function sendMessage(textOverride) {
+    const text = textOverride || input.value.trim();
+    if (!text) return;
 
-      const res = await fetch(API + "/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: text })
-      });
+    addBubble(text, "user");
+    input.value = "";
 
-      const data = await res.json();
-      addMessage(data.reply, "ai");
-    }
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: text })
+    });
 
-    async function loadNews() {
-      const res = await fetch(API + "/api/noticias");
-      const data = await res.json();
-      document.getElementById("news-content").innerText = data.reply;
-    }
+    const data = await res.json();
+    addBubble(data.reply, "bot");
+  }
 
-    loadNews();
-  </script>
+  function sendPreset(text) {
+    sendMessage(text);
+  }
+</script>
 
 </body>
 </html>
