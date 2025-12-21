@@ -1,161 +1,80 @@
 import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "openai/gpt-4o-mini";
-
-/* ===============================
-   FUNÇÃO CENTRAL – CHAMADA IA
-================================ */
-async function chamarIA(prompt) {
-  const response = await fetch(OPENROUTER_URL, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-      "Content-Type": "application/json",
-      "HTTP-Referer": "https://verdadeegraca.github.io",
-      "X-Title": "Verdade & Graça"
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      temperature: 0.4,
-      messages: [
-        {
-          role: "system",
-          content: `
-Você é uma IA cristã reformada.
-RESPONDA OBRIGATORIAMENTE EM JSON VÁLIDO.
-NUNCA use markdown.
-NUNCA escreva texto fora do JSON.
-`
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ]
-    })
-  });
-
-  const data = await response.json();
-
-  if (!data.choices || !data.choices[0]) {
-    throw new Error("Resposta inválida da IA");
-  }
-
-  const texto = data.choices[0].message.content;
+/* =========================
+   CHAT COM IA
+========================= */
+app.post("/api/chat", async (req, res) => {
+  const { messages } = req.body;
 
   try {
-    return JSON.parse(texto);
-  } catch (e) {
-    throw new Error("IA retornou JSON inválido");
-  }
-}
-
-/* ===============================
-   ROTA: CHAT (USUÁRIO)
-================================ */
-app.post("/api/pergunta", async (req, res) => {
-  try {
-    const { mensagem } = req.body;
-
-    const prompt = `
-Analise a mensagem abaixo.
-Se for notícia: faça análise factual e bíblica.
-Se for pergunta bíblica: responda biblicamente.
-
-Retorne no formato:
-{
-  "resposta": "texto completo"
-}
-
-Mensagem:
-"${mensagem}"
-`;
-
-    const resultado = await chamarIA(prompt);
-
-    res.json({
-      resposta: resultado.resposta
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-4o",
+        messages,
+        temperature: 0.7
+      })
     });
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      resposta: "Erro ao analisar. Tente novamente em instantes."
-    });
+    const data = await response.json();
+    res.json(data.choices[0].message);
+
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao comunicar com a IA" });
   }
 });
 
-/* ===============================
-   ROTA: NOTÍCIAS DO DIA (12)
-================================ */
+/* =========================
+   NOTÍCIAS IMPARCIAIS
+========================= */
 app.get("/api/noticias", async (req, res) => {
-  try {
-    const prompt = `
-Liste AS 12 NOTÍCIAS MAIS FALADAS DO DIA
-(relacionadas a política, economia e ciência).
-
-Para cada notícia retorne:
-- titulo
-- categoria
-- statusFactual (Verdadeira, Falsa ou Em verificação)
-- relevancia (Alta, Média ou Baixa)
-- analise
-- reflexaoBiblica
-
-Formato obrigatório:
-{
-  "noticias": [
-    {
-      "titulo": "",
-      "categoria": "",
-      "statusFactual": "",
-      "relevancia": "",
-      "analise": "",
-      "reflexaoBiblica": ""
-    }
-  ]
-}
+  const prompt = `
+Gere 12 notícias imparciais no estilo jornalístico profissional.
+Para cada notícia, forneça:
+- Título
+- Resumo objetivo
+- Análise de relevância e veracidade
+- Reflexão bíblica conectada ao tema (sem proselitismo político)
+Formato JSON.
 `;
 
-    const resultado = await chamarIA(prompt);
-
-    if (!resultado.noticias || resultado.noticias.length !== 12) {
-      throw new Error("Quantidade incorreta de notícias");
-    }
-
-    res.json(resultado);
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      noticias: []
+  try {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-4o",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.4
+      })
     });
+
+    const data = await response.json();
+    res.json(JSON.parse(data.choices[0].message.content));
+
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao gerar notícias" });
   }
 });
 
-/* ===============================
-   HEALTH CHECK
-================================ */
-app.get("/", (req, res) => {
-  res.send("✅ Verdade & Graça API rodando");
+/* ========================= */
+app.listen(PORT, () => {
+  console.log("🔥 Verdade & Graça API rodando");
 });
 
-/* ===============================
-   START
-================================ */
-app.listen(PORT, () => {
-  console.log(`🔥 API Verdade & Graça rodando na porta ${PORT}`);
-});
