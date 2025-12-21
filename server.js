@@ -1,97 +1,140 @@
 import express from "express";
 import cors from "cors";
-import fetch from "node-fetch";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middlewares
-app.use(cors());
+/* =========================
+   MIDDLEWARES
+========================= */
+
+app.use(cors({
+  origin: "*", // GitHub Pages precisa disso
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type"]
+}));
+
 app.use(express.json());
 
-// Health check (IMPORTANTE para o Render)
+/* =========================
+   ROTAS
+========================= */
+
+// Rota de teste (sanidade)
 app.get("/", (req, res) => {
   res.json({
-    status: "ok",
+    status: "online",
     app: "Verdade & Graça",
-    message: "Backend ativo e funcionando"
+    mensagem: "Servidor ativo e funcionando."
   });
 });
 
-// Endpoint principal de análise
-app.post("/analisar", async (req, res) => {
-  try {
-    const { texto } = req.body;
+/* =========================
+   ANÁLISE DE TEXTO
+========================= */
 
-    if (!texto || texto.trim().length < 5) {
-      return res.status(400).json({
-        erro: "Texto inválido para análise"
-      });
-    }
+app.post("/api/analisar", async (req, res) => {
+  const { texto } = req.body;
 
-    const prompt = `
-Você é um analista cristão que avalia notícias e temas à luz da verdade factual e da Bíblia.
-
-TAREFAS:
-1. Avalie se o conteúdo é verdadeiro, falso ou inconclusivo.
-2. Analise a relevância social.
-3. Faça uma análise bíblica equilibrada, citando princípios ou textos (Antigo e Novo Testamento).
-4. Seja respeitoso, claro e pastoral.
-
-FORMATO DA RESPOSTA:
-- 📌 Veracidade:
-- 📊 Relevância:
-- 📖 Análise Bíblica:
-- 🧭 Discernimento Cristão:
-
-CONTEÚDO:
-"""${texto}"""
-`;
-
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://verdadeegraca.onrender.com",
-        "X-Title": "Verdade & Graça"
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-4o-mini",
-        messages: [
-          { role: "system", content: "Você é um especialista em discernimento cristão e análise factual." },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.6
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText);
-    }
-
-    const data = await response.json();
-    const resposta = data.choices?.[0]?.message?.content;
-
-    res.json({
-      sucesso: true,
-      resposta
-    });
-
-  } catch (error) {
-    console.error("Erro na análise:", error.message);
-    res.status(500).json({
-      sucesso: false,
-      erro: "Erro ao analisar o conteúdo"
+  if (!texto) {
+    return res.status(400).json({
+      erro: "Texto não enviado."
     });
   }
+
+  // 🔹 Análise simulada (IA entra aqui depois)
+  const resposta = `
+O tema apresentado nos leva a refletir à luz das Escrituras.
+
+A Bíblia nos ensina que toda verdade procede de Deus (João 17:17).
+Ao analisarmos esse assunto, somos chamados ao discernimento espiritual,
+não reagindo segundo o mundo, mas segundo a mente de Cristo (Romanos 12:2).
+
+Que essa reflexão conduza à edificação, sabedoria e graça.
+  `;
+
+  res.json({
+    entrada: texto,
+    resposta
+  });
 });
 
-// Start server
+/* =========================
+   NOTÍCIAS DO DIA (12)
+========================= */
+
+app.get("/api/noticias", (req, res) => {
+
+  const noticias = [
+    {
+      titulo: "Conflitos internacionais elevam tensões globais",
+      analise: "A busca por poder e domínio revela a ausência de justiça verdadeira.",
+      reflexao: "Bem-aventurados os pacificadores, porque serão chamados filhos de Deus. (Mt 5:9)"
+    },
+    {
+      titulo: "Economia global enfrenta novos desafios",
+      analise: "A instabilidade econômica expõe a fragilidade da confiança no material.",
+      reflexao: "Não ajunteis tesouros na terra... (Mateus 6:19)"
+    },
+    {
+      titulo: "Avanços em inteligência artificial aceleram transformações",
+      analise: "O conhecimento cresce, mas sem sabedoria pode se tornar soberba.",
+      reflexao: "O temor do Senhor é o princípio da sabedoria. (Provérbios 9:10)"
+    },
+    {
+      titulo: "Debates sobre ética digital ganham força",
+      analise: "A tecnologia amplia o alcance do coração humano — para o bem ou para o mal.",
+      reflexao: "Sobre tudo o que se deve guardar, guarda o teu coração. (Pv 4:23)"
+    },
+    {
+      titulo: "Crises humanitárias aumentam em regiões vulneráveis",
+      analise: "A indiferença do mundo contrasta com o chamado ao amor ao próximo.",
+      reflexao: "Amai o vosso próximo como a vós mesmos. (Mateus 22:39)"
+    },
+    {
+      titulo: "Mudanças climáticas geram alertas globais",
+      analise: "A criação geme, aguardando redenção.",
+      reflexao: "A criação aguarda a revelação dos filhos de Deus. (Romanos 8:19)"
+    },
+    {
+      titulo: "Sociedade discute limites da liberdade de expressão",
+      analise: "Liberdade sem verdade se torna confusão.",
+      reflexao: "Conhecereis a verdade, e a verdade vos libertará. (João 8:32)"
+    },
+    {
+      titulo: "Aumento de ansiedade e depressão preocupa especialistas",
+      analise: "A alma humana clama por descanso que o mundo não pode oferecer.",
+      reflexao: "Vinde a mim, todos os que estais cansados... (Mateus 11:28)"
+    },
+    {
+      titulo: "Educação enfrenta crise de valores",
+      analise: "Ensinar sem fundamento moral gera conhecimento vazio.",
+      reflexao: "Instrui o menino no caminho em que deve andar. (Provérbios 22:6)"
+    },
+    {
+      titulo: "Avivamentos locais despertam interesse espiritual",
+      analise: "Deus continua chamando seu povo ao arrependimento e retorno.",
+      reflexao: "Se o meu povo se humilhar... (2 Crônicas 7:14)"
+    },
+    {
+      titulo: "Cresce o debate sobre identidade e propósito",
+      analise: "Sem Criador, a criatura perde seu sentido.",
+      reflexao: "Antes que te formasse no ventre, eu te conheci. (Jeremias 1:5)"
+    },
+    {
+      titulo: "Igrejas discutem seu papel na sociedade moderna",
+      analise: "A Igreja não deve se moldar ao mundo, mas transformá-lo.",
+      reflexao: "Vós sois o sal da terra. (Mateus 5:13)"
+    }
+  ];
+
+  res.json(noticias);
+});
+
+/* =========================
+   START SERVER
+========================= */
+
 app.listen(PORT, () => {
-  console.log(`🔥 Verdade & Graça backend rodando na porta ${PORT}`);
+  console.log(`🔥 Verdade & Graça rodando na porta ${PORT}`);
 });
