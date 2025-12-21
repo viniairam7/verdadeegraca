@@ -1,140 +1,161 @@
 import express from "express";
 import cors from "cors";
+import fetch from "node-fetch";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-/* =========================
-   MIDDLEWARES
-========================= */
-
-app.use(cors({
-  origin: "*", // GitHub Pages precisa disso
-  methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type"]
-}));
-
+app.use(cors());
 app.use(express.json());
 
-/* =========================
-   ROTAS
-========================= */
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const MODEL = "openai/gpt-4o-mini";
 
-// Rota de teste (sanidade)
-app.get("/", (req, res) => {
-  res.json({
-    status: "online",
-    app: "Verdade & Graça",
-    mensagem: "Servidor ativo e funcionando."
+/* ===============================
+   FUNÇÃO CENTRAL – CHAMADA IA
+================================ */
+async function chamarIA(prompt) {
+  const response = await fetch(OPENROUTER_URL, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+      "Content-Type": "application/json",
+      "HTTP-Referer": "https://verdadeegraca.github.io",
+      "X-Title": "Verdade & Graça"
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      temperature: 0.4,
+      messages: [
+        {
+          role: "system",
+          content: `
+Você é uma IA cristã reformada.
+RESPONDA OBRIGATORIAMENTE EM JSON VÁLIDO.
+NUNCA use markdown.
+NUNCA escreva texto fora do JSON.
+`
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ]
+    })
   });
-});
 
-/* =========================
-   ANÁLISE DE TEXTO
-========================= */
+  const data = await response.json();
 
-app.post("/api/analisar", async (req, res) => {
-  const { texto } = req.body;
-
-  if (!texto) {
-    return res.status(400).json({
-      erro: "Texto não enviado."
-    });
+  if (!data.choices || !data.choices[0]) {
+    throw new Error("Resposta inválida da IA");
   }
 
-  // 🔹 Análise simulada (IA entra aqui depois)
-  const resposta = `
-O tema apresentado nos leva a refletir à luz das Escrituras.
+  const texto = data.choices[0].message.content;
 
-A Bíblia nos ensina que toda verdade procede de Deus (João 17:17).
-Ao analisarmos esse assunto, somos chamados ao discernimento espiritual,
-não reagindo segundo o mundo, mas segundo a mente de Cristo (Romanos 12:2).
+  try {
+    return JSON.parse(texto);
+  } catch (e) {
+    throw new Error("IA retornou JSON inválido");
+  }
+}
 
-Que essa reflexão conduza à edificação, sabedoria e graça.
-  `;
+/* ===============================
+   ROTA: CHAT (USUÁRIO)
+================================ */
+app.post("/api/pergunta", async (req, res) => {
+  try {
+    const { mensagem } = req.body;
 
-  res.json({
-    entrada: texto,
-    resposta
-  });
+    const prompt = `
+Analise a mensagem abaixo.
+Se for notícia: faça análise factual e bíblica.
+Se for pergunta bíblica: responda biblicamente.
+
+Retorne no formato:
+{
+  "resposta": "texto completo"
+}
+
+Mensagem:
+"${mensagem}"
+`;
+
+    const resultado = await chamarIA(prompt);
+
+    res.json({
+      resposta: resultado.resposta
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      resposta: "Erro ao analisar. Tente novamente em instantes."
+    });
+  }
 });
 
-/* =========================
-   NOTÍCIAS DO DIA (12)
-========================= */
+/* ===============================
+   ROTA: NOTÍCIAS DO DIA (12)
+================================ */
+app.get("/api/noticias", async (req, res) => {
+  try {
+    const prompt = `
+Liste AS 12 NOTÍCIAS MAIS FALADAS DO DIA
+(relacionadas a política, economia e ciência).
 
-app.get("/api/noticias", (req, res) => {
+Para cada notícia retorne:
+- titulo
+- categoria
+- statusFactual (Verdadeira, Falsa ou Em verificação)
+- relevancia (Alta, Média ou Baixa)
+- analise
+- reflexaoBiblica
 
-  const noticias = [
+Formato obrigatório:
+{
+  "noticias": [
     {
-      titulo: "Conflitos internacionais elevam tensões globais",
-      analise: "A busca por poder e domínio revela a ausência de justiça verdadeira.",
-      reflexao: "Bem-aventurados os pacificadores, porque serão chamados filhos de Deus. (Mt 5:9)"
-    },
-    {
-      titulo: "Economia global enfrenta novos desafios",
-      analise: "A instabilidade econômica expõe a fragilidade da confiança no material.",
-      reflexao: "Não ajunteis tesouros na terra... (Mateus 6:19)"
-    },
-    {
-      titulo: "Avanços em inteligência artificial aceleram transformações",
-      analise: "O conhecimento cresce, mas sem sabedoria pode se tornar soberba.",
-      reflexao: "O temor do Senhor é o princípio da sabedoria. (Provérbios 9:10)"
-    },
-    {
-      titulo: "Debates sobre ética digital ganham força",
-      analise: "A tecnologia amplia o alcance do coração humano — para o bem ou para o mal.",
-      reflexao: "Sobre tudo o que se deve guardar, guarda o teu coração. (Pv 4:23)"
-    },
-    {
-      titulo: "Crises humanitárias aumentam em regiões vulneráveis",
-      analise: "A indiferença do mundo contrasta com o chamado ao amor ao próximo.",
-      reflexao: "Amai o vosso próximo como a vós mesmos. (Mateus 22:39)"
-    },
-    {
-      titulo: "Mudanças climáticas geram alertas globais",
-      analise: "A criação geme, aguardando redenção.",
-      reflexao: "A criação aguarda a revelação dos filhos de Deus. (Romanos 8:19)"
-    },
-    {
-      titulo: "Sociedade discute limites da liberdade de expressão",
-      analise: "Liberdade sem verdade se torna confusão.",
-      reflexao: "Conhecereis a verdade, e a verdade vos libertará. (João 8:32)"
-    },
-    {
-      titulo: "Aumento de ansiedade e depressão preocupa especialistas",
-      analise: "A alma humana clama por descanso que o mundo não pode oferecer.",
-      reflexao: "Vinde a mim, todos os que estais cansados... (Mateus 11:28)"
-    },
-    {
-      titulo: "Educação enfrenta crise de valores",
-      analise: "Ensinar sem fundamento moral gera conhecimento vazio.",
-      reflexao: "Instrui o menino no caminho em que deve andar. (Provérbios 22:6)"
-    },
-    {
-      titulo: "Avivamentos locais despertam interesse espiritual",
-      analise: "Deus continua chamando seu povo ao arrependimento e retorno.",
-      reflexao: "Se o meu povo se humilhar... (2 Crônicas 7:14)"
-    },
-    {
-      titulo: "Cresce o debate sobre identidade e propósito",
-      analise: "Sem Criador, a criatura perde seu sentido.",
-      reflexao: "Antes que te formasse no ventre, eu te conheci. (Jeremias 1:5)"
-    },
-    {
-      titulo: "Igrejas discutem seu papel na sociedade moderna",
-      analise: "A Igreja não deve se moldar ao mundo, mas transformá-lo.",
-      reflexao: "Vós sois o sal da terra. (Mateus 5:13)"
+      "titulo": "",
+      "categoria": "",
+      "statusFactual": "",
+      "relevancia": "",
+      "analise": "",
+      "reflexaoBiblica": ""
     }
-  ];
+  ]
+}
+`;
 
-  res.json(noticias);
+    const resultado = await chamarIA(prompt);
+
+    if (!resultado.noticias || resultado.noticias.length !== 12) {
+      throw new Error("Quantidade incorreta de notícias");
+    }
+
+    res.json(resultado);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      noticias: []
+    });
+  }
 });
 
-/* =========================
-   START SERVER
-========================= */
+/* ===============================
+   HEALTH CHECK
+================================ */
+app.get("/", (req, res) => {
+  res.send("✅ Verdade & Graça API rodando");
+});
 
+/* ===============================
+   START
+================================ */
 app.listen(PORT, () => {
-  console.log(`🔥 Verdade & Graça rodando na porta ${PORT}`);
+  console.log(`🔥 API Verdade & Graça rodando na porta ${PORT}`);
 });
