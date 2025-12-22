@@ -1,154 +1,234 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Verdade & Graça</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Verdade & Graça</title>
 
-<style>
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #0c0c0c;
-  color: #fff;
-}
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --card: #1a1a1a;
+      --gold: #d6b86a;
+      --green: #1f3d2b;
+      --green-border: #2e6b4e;
+      --text: #eaeaea;
+      --muted: #9a9a9a;
+    }
 
-header {
-  text-align: center;
-  padding: 24px 16px 12px;
-}
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+    }
 
-header h1 {
-  color: #d6b25e;
-  margin: 0;
-}
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
 
-header p {
-  opacity: 0.7;
-  font-size: 14px;
-}
+    header {
+      text-align: center;
+      padding: 20px 16px 10px;
+    }
 
-.actions {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-}
+    header h1 {
+      margin: 0;
+      color: var(--gold);
+      font-size: 28px;
+    }
 
-.btn {
-  background: #1b1b1b;
-  border-radius: 16px;
-  padding: 14px;
-  text-align: center;
-  color: #d6b25e;
-  font-weight: 500;
-}
+    header p {
+      margin: 6px 0 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
 
-.chat {
-  padding: 16px;
-}
+    .actions {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+    }
 
-.msg.user {
-  background: #1f3d2b;
-  border-radius: 14px;
-  padding: 12px;
-  margin-bottom: 10px;
-}
+    .action-btn {
+      background: var(--card);
+      color: var(--gold);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #2a2a2a;
+    }
 
-.msg.bot {
-  background: #1b1b1b;
-  border-left: 4px solid #d6b25e;
-  border-radius: 14px;
-  padding: 12px;
-  margin-bottom: 20px;
-}
+    .chat {
+      padding: 10px 14px 120px;
+    }
 
-.input-area {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  display: flex;
-  gap: 8px;
-  padding: 10px;
-  background: #0c0c0c;
-}
+    .bubble {
+      margin-bottom: 12px;
+      max-width: 92%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 15px;
+      line-height: 1.4;
+    }
 
-input {
-  flex: 1;
-  border-radius: 12px;
-  border: none;
-  padding: 12px;
-}
+    .user {
+      background: var(--green);
+      border-left: 4px solid var(--green-border);
+      margin-left: auto;
+    }
 
-.send {
-  background: #d6b25e;
-  border-radius: 12px;
-  padding: 0 16px;
-  font-size: 18px;
-}
-</style>
+    .bot {
+      background: var(--card);
+      border-left: 4px solid var(--gold);
+    }
+
+    .copy {
+      font-size: 13px;
+      margin-top: 6px;
+      color: var(--gold);
+      cursor: pointer;
+    }
+
+    .input-bar {
+      position: fixed;
+      bottom: env(safe-area-inset-bottom);
+      left: 0;
+      right: 0;
+      background: #121212;
+      padding: 10px;
+      display: flex;
+      gap: 8px;
+      border-top: 1px solid #222;
+    }
+
+    .input-bar input {
+      flex: 1;
+      border-radius: 12px;
+      border: none;
+      padding: 12px;
+      font-size: 15px;
+    }
+
+    .send-btn {
+      width: 48px;
+      border-radius: 12px;
+      background: var(--gold);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .send-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: #000;
+    }
+
+    .book-btn {
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      width: 42px;
+      height: 42px;
+      background: var(--card);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 1px solid #2a2a2a;
+    }
+
+    .book-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: var(--gold);
+    }
+  </style>
 </head>
 
 <body>
 
-<header>
-  <h1>Verdade & Graça</h1>
-  <p>Tudo deve ser examinado à luz da Palavra</p>
-</header>
+  <!-- Botão Estudos -->
+  <div class="book-btn" onclick="window.open('https://drive.google.com/drive/folders/1bRn3zs-SpuGXOzWb47BmKJGrxrOV3M7O')">
+    <svg viewBox="0 0 24 24">
+      <path d="M4 4h13a3 3 0 013 3v13H7a3 3 0 01-3-3V4zm3 14h13V7a1 1 0 00-1-1H7v12z"/>
+    </svg>
+  </div>
 
-<div class="actions">
-  <div class="btn" onclick="sendPreset('news','Notícias da semana')">📰 Notícias da semana</div>
-  <div class="btn" onclick="sendPreset('devotional','Devocional de hoje')">📖 Devocional de hoje</div>
-  <div class="btn" onclick="sendPreset('jesus','O que Jesus faria?')">✝️ O que Jesus faria?</div>
-  <div class="btn" onclick="window.open('https://drive.google.com/drive/folders/1bRn3zs-SpuGXOzWb47BmKJGrxrOV3M7O')">📚 Estudos</div>
-</div>
+  <header>
+    <h1>Verdade & Graça</h1>
+    <p>Tudo deve ser examinado à luz da Palavra</p>
+  </header>
 
-<div class="chat" id="chat"></div>
+  <div class="actions">
+    <div class="action-btn" onclick="sendPreset('Notícias do dia')">📰 Notícias do dia</div>
+    <div class="action-btn" onclick="sendPreset('Devocional de hoje')">📖 Devocional de hoje</div>
+    <div class="action-btn" onclick="sendPreset('O que Jesus faria?')">✝️ O que Jesus faria?</div>
+  </div>
 
-<div class="input-area">
-  <input id="input" placeholder="Digite sua dúvida bíblica..." />
-  <div class="send" onclick="sendText()">➤</div>
-</div>
+  <div class="chat" id="chat"></div>
+
+  <div class="input-bar">
+    <input id="input" placeholder="Digite sua dúvida bíblica..." />
+    <button class="send-btn" onclick="sendMessage()">
+      <svg viewBox="0 0 24 24">
+        <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
+      </svg>
+    </button>
+  </div>
 
 <script>
+const API_URL = "https://verdadeegraca.onrender.com/api/chat";
 const chat = document.getElementById("chat");
+const input = document.getElementById("input");
 
-function addMessage(text, cls) {
+function addBubble(text, type) {
   const div = document.createElement("div");
-  div.className = "msg " + cls;
-  div.textContent = text;
+  div.className = `bubble ${type}`;
+  div.innerHTML = text;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
-  return div;
 }
 
-function stream(type, label) {
-  addMessage(label, "user");
-  const botMsg = addMessage("", "bot");
+async function sendToAPI(text) {
+  addBubble(text, "user");
 
-  const evt = new EventSourcePolyfill("/api/chat-stream", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    payload: JSON.stringify({ type })
-  });
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: text })
+    });
 
-  evt.onmessage = e => {
-    botMsg.textContent += e.data;
-    chat.scrollTop = chat.scrollHeight;
-  };
+    const data = await res.json();
 
-  evt.addEventListener("done", () => evt.close());
+    if (!data.reply) throw new Error();
+
+    addBubble(
+      `${data.reply}<div class="copy" onclick="navigator.clipboard.writeText('${data.reply.replace(/'/g, "")}')">📋 Copiar</div>`,
+      "bot"
+    );
+
+  } catch {
+    addBubble("Não foi possível gerar a resposta agora.", "bot");
+  }
 }
 
-function sendPreset(type, label) {
-  stream(type, label);
-}
-
-function sendText() {
-  const val = input.value.trim();
-  if (!val) return;
+function sendMessage() {
+  const text = input.value.trim();
+  if (!text) return;
   input.value = "";
-  stream(null, val);
+  sendToAPI(text);
+}
+
+function sendPreset(text) {
+  sendToAPI(text);
 }
 </script>
 
