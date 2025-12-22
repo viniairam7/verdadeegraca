@@ -94,19 +94,30 @@ button {
 <script>
 async function enviar() {
   const texto = document.getElementById("rotina").value.trim();
+  const respostaDiv = document.getElementById("resposta");
+
   if (!texto) return;
 
-  const respostaDiv = document.getElementById("resposta");
   respostaDiv.textContent = "Refletindo seu dia com calma...";
 
-  const res = await fetch("/api/rotina", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ rotina: texto })
-  });
+  try {
+    const res = await fetch("/api/rotina", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rotina: texto })
+    });
 
-  const data = await res.json();
-  respostaDiv.textContent = data.resposta;
+    if (!res.ok) {
+      throw new Error("Erro no servidor");
+    }
+
+    const data = await res.json();
+    respostaDiv.textContent = data.resposta;
+
+  } catch (err) {
+    respostaDiv.textContent =
+      "Não consegui refletir agora. Tente novamente em instantes.";
+  }
 }
 </script>
 
