@@ -1,234 +1,169 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Verdade & Graça</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Verdade & Graça</title>
 
-  <style>
-    :root {
-      --bg: #0f0f0f;
-      --card: #1a1a1a;
-      --gold: #d6b86a;
-      --green: #1f3d2b;
-      --green-border: #2e6b4e;
-      --text: #eaeaea;
-      --muted: #9a9a9a;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  background: radial-gradient(circle at top, #111, #000);
+  color: #eee;
+}
 
-    * {
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-    }
+header {
+  text-align: center;
+  padding: 24px 16px 12px;
+}
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-    }
+header h1 {
+  color: #d6b15a;
+  margin: 0;
+}
 
-    header {
-      text-align: center;
-      padding: 20px 16px 10px;
-    }
+header p {
+  opacity: 0.7;
+  margin-top: 6px;
+}
 
-    header h1 {
-      margin: 0;
-      color: var(--gold);
-      font-size: 28px;
-    }
+.actions {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-    header p {
-      margin: 6px 0 0;
-      font-size: 14px;
-      color: var(--muted);
-    }
+.action-btn {
+  background: #181818;
+  border: 1px solid #222;
+  color: #d6b15a;
+  padding: 14px;
+  border-radius: 16px;
+  font-size: 16px;
+}
 
-    .actions {
-      display: grid;
-      gap: 10px;
-      padding: 14px;
-    }
+.chat {
+  padding: 12px;
+  padding-bottom: 90px;
+}
 
-    .action-btn {
-      background: var(--card);
-      color: var(--gold);
-      border-radius: 14px;
-      padding: 14px;
-      text-align: center;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid #2a2a2a;
-    }
+.msg-user {
+  background: #1f3d2b;
+  padding: 12px 14px;
+  border-radius: 14px;
+  margin-bottom: 8px;
+}
 
-    .chat {
-      padding: 10px 14px 120px;
-    }
+.msg-ai {
+  background: #141414;
+  border-left: 4px solid #d6b15a;
+  padding: 12px 14px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  white-space: pre-wrap;
+}
 
-    .bubble {
-      margin-bottom: 12px;
-      max-width: 92%;
-      padding: 12px 14px;
-      border-radius: 14px;
-      font-size: 15px;
-      line-height: 1.4;
-    }
+.input-box {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #0b0b0b;
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+}
 
-    .user {
-      background: var(--green);
-      border-left: 4px solid var(--green-border);
-      margin-left: auto;
-    }
+input {
+  flex: 1;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+}
 
-    .bot {
-      background: var(--card);
-      border-left: 4px solid var(--gold);
-    }
-
-    .copy {
-      font-size: 13px;
-      margin-top: 6px;
-      color: var(--gold);
-      cursor: pointer;
-    }
-
-    .input-bar {
-      position: fixed;
-      bottom: env(safe-area-inset-bottom);
-      left: 0;
-      right: 0;
-      background: #121212;
-      padding: 10px;
-      display: flex;
-      gap: 8px;
-      border-top: 1px solid #222;
-    }
-
-    .input-bar input {
-      flex: 1;
-      border-radius: 12px;
-      border: none;
-      padding: 12px;
-      font-size: 15px;
-    }
-
-    .send-btn {
-      width: 48px;
-      border-radius: 12px;
-      background: var(--gold);
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    .send-btn svg {
-      width: 20px;
-      height: 20px;
-      fill: #000;
-    }
-
-    .book-btn {
-      position: fixed;
-      top: 14px;
-      right: 14px;
-      width: 42px;
-      height: 42px;
-      background: var(--card);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      border: 1px solid #2a2a2a;
-    }
-
-    .book-btn svg {
-      width: 22px;
-      height: 22px;
-      fill: var(--gold);
-    }
-  </style>
+button.send {
+  background: #d6b15a;
+  border: none;
+  border-radius: 14px;
+  width: 52px;
+  font-size: 20px;
+}
+</style>
 </head>
 
 <body>
 
-  <!-- Botão Estudos -->
-  <div class="book-btn" onclick="window.open('https://drive.google.com/drive/folders/1bRn3zs-SpuGXOzWb47BmKJGrxrOV3M7O')">
-    <svg viewBox="0 0 24 24">
-      <path d="M4 4h13a3 3 0 013 3v13H7a3 3 0 01-3-3V4zm3 14h13V7a1 1 0 00-1-1H7v12z"/>
-    </svg>
-  </div>
+<header>
+  <h1>Verdade & Graça</h1>
+  <p>Tudo deve ser examinado à luz da Palavra</p>
+</header>
 
-  <header>
-    <h1>Verdade & Graça</h1>
-    <p>Tudo deve ser examinado à luz da Palavra</p>
-  </header>
+<div class="actions">
+  <button class="action-btn" onclick="send('Notícias da semana')">📰 Notícias da semana</button>
+  <button class="action-btn" onclick="send('Devocional de hoje')">📖 Devocional de hoje</button>
+  <button class="action-btn" onclick="send('O que Jesus faria?')">✝️ O que Jesus faria?</button>
+</div>
 
-  <div class="actions">
-    <div class="action-btn" onclick="sendPreset('Notícias do dia')">📰 Notícias do dia</div>
-    <div class="action-btn" onclick="sendPreset('Devocional de hoje')">📖 Devocional de hoje</div>
-    <div class="action-btn" onclick="sendPreset('O que Jesus faria?')">✝️ O que Jesus faria?</div>
-  </div>
+<div class="chat" id="chat"></div>
 
-  <div class="chat" id="chat"></div>
-
-  <div class="input-bar">
-    <input id="input" placeholder="Digite sua dúvida bíblica..." />
-    <button class="send-btn" onclick="sendMessage()">
-      <svg viewBox="0 0 24 24">
-        <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
-      </svg>
-    </button>
-  </div>
+<div class="input-box">
+  <input id="input" placeholder="Digite sua dúvida bíblica..." />
+  <button class="send" onclick="send()">➤</button>
+</div>
 
 <script>
-const API_URL = "https://verdadeegraca.onrender.com/api/chat";
 const chat = document.getElementById("chat");
-const input = document.getElementById("input");
 
-function addBubble(text, type) {
+function addMsg(text, cls) {
   const div = document.createElement("div");
-  div.className = `bubble ${type}`;
-  div.innerHTML = text;
+  div.className = cls;
+  div.textContent = text;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
+  return div;
 }
 
-async function sendToAPI(text) {
-  addBubble(text, "user");
-
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: text })
-    });
-
-    const data = await res.json();
-
-    if (!data.reply) throw new Error();
-
-    addBubble(
-      `${data.reply}<div class="copy" onclick="navigator.clipboard.writeText('${data.reply.replace(/'/g, "")}')">📋 Copiar</div>`,
-      "bot"
-    );
-
-  } catch {
-    addBubble("Não foi possível gerar a resposta agora.", "bot");
-  }
-}
-
-function sendMessage() {
-  const text = input.value.trim();
+function send(fixedText) {
+  const input = document.getElementById("input");
+  const text = fixedText || input.value.trim();
   if (!text) return;
   input.value = "";
-  sendToAPI(text);
+
+  addMsg(text, "msg-user");
+  const aiBox = addMsg("", "msg-ai");
+
+  const evt = new EventSourcePolyfill("/api/chat-stream", {
+    headers: { "Content-Type": "application/json" },
+    payload: JSON.stringify({ prompt: text })
+  });
+
+  evt.onmessage = e => {
+    aiBox.textContent += e.data;
+    chat.scrollTop = chat.scrollHeight;
+  };
+
+  evt.addEventListener("end", () => evt.close());
 }
 
-function sendPreset(text) {
-  sendToAPI(text);
+/* Polyfill simples */
+function EventSourcePolyfill(url, options) {
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", url);
+  for (const h in options.headers) xhr.setRequestHeader(h, options.headers[h]);
+  xhr.send(options.payload);
+
+  const es = {};
+  xhr.onprogress = () => {
+    const lines = xhr.responseText.split("\n\n");
+    const last = lines[lines.length - 1];
+    if (last.startsWith("data: ")) {
+      es.onmessage && es.onmessage({ data: last.replace("data: ", "") });
+    }
+  };
+  xhr.onload = () => es.onend && es.onend();
+  return es;
 }
 </script>
 
