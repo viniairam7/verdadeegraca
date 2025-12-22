@@ -2,15 +2,15 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Verdade & Graça</title>
 
 <style>
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont;
-  background: radial-gradient(circle at top, #111, #000);
-  color: #eee;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #0c0c0c;
+  color: #fff;
 }
 
 header {
@@ -19,76 +19,72 @@ header {
 }
 
 header h1 {
-  color: #d6b15a;
+  color: #d6b25e;
   margin: 0;
 }
 
 header p {
   opacity: 0.7;
-  margin-top: 6px;
+  font-size: 14px;
 }
 
 .actions {
-  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  padding: 16px;
 }
 
-.action-btn {
-  background: #181818;
-  border: 1px solid #222;
-  color: #d6b15a;
-  padding: 14px;
+.btn {
+  background: #1b1b1b;
   border-radius: 16px;
-  font-size: 16px;
+  padding: 14px;
+  text-align: center;
+  color: #d6b25e;
+  font-weight: 500;
 }
 
 .chat {
-  padding: 12px;
-  padding-bottom: 90px;
+  padding: 16px;
 }
 
-.msg-user {
+.msg.user {
   background: #1f3d2b;
-  padding: 12px 14px;
   border-radius: 14px;
-  margin-bottom: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
 }
 
-.msg-ai {
-  background: #141414;
-  border-left: 4px solid #d6b15a;
-  padding: 12px 14px;
+.msg.bot {
+  background: #1b1b1b;
+  border-left: 4px solid #d6b25e;
   border-radius: 14px;
-  margin-bottom: 14px;
-  white-space: pre-wrap;
+  padding: 12px;
+  margin-bottom: 20px;
 }
 
-.input-box {
+.input-area {
   position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
-  background: #0b0b0b;
-  padding: 10px;
+  width: 100%;
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  padding: 10px;
+  background: #0c0c0c;
 }
 
 input {
   flex: 1;
-  padding: 14px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: none;
+  padding: 12px;
 }
 
-button.send {
-  background: #d6b15a;
-  border: none;
-  border-radius: 14px;
-  width: 52px;
-  font-size: 20px;
+.send {
+  background: #d6b25e;
+  border-radius: 12px;
+  padding: 0 16px;
+  font-size: 18px;
 }
 </style>
 </head>
@@ -101,69 +97,58 @@ button.send {
 </header>
 
 <div class="actions">
-  <button class="action-btn" onclick="send('Notícias da semana')">📰 Notícias da semana</button>
-  <button class="action-btn" onclick="send('Devocional de hoje')">📖 Devocional de hoje</button>
-  <button class="action-btn" onclick="send('O que Jesus faria?')">✝️ O que Jesus faria?</button>
+  <div class="btn" onclick="sendPreset('news','Notícias da semana')">📰 Notícias da semana</div>
+  <div class="btn" onclick="sendPreset('devotional','Devocional de hoje')">📖 Devocional de hoje</div>
+  <div class="btn" onclick="sendPreset('jesus','O que Jesus faria?')">✝️ O que Jesus faria?</div>
+  <div class="btn" onclick="window.open('https://drive.google.com/drive/folders/1bRn3zs-SpuGXOzWb47BmKJGrxrOV3M7O')">📚 Estudos</div>
 </div>
 
 <div class="chat" id="chat"></div>
 
-<div class="input-box">
+<div class="input-area">
   <input id="input" placeholder="Digite sua dúvida bíblica..." />
-  <button class="send" onclick="send()">➤</button>
+  <div class="send" onclick="sendText()">➤</div>
 </div>
 
 <script>
 const chat = document.getElementById("chat");
 
-function addMsg(text, cls) {
+function addMessage(text, cls) {
   const div = document.createElement("div");
-  div.className = cls;
+  div.className = "msg " + cls;
   div.textContent = text;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
   return div;
 }
 
-function send(fixedText) {
-  const input = document.getElementById("input");
-  const text = fixedText || input.value.trim();
-  if (!text) return;
-  input.value = "";
-
-  addMsg(text, "msg-user");
-  const aiBox = addMsg("", "msg-ai");
+function stream(type, label) {
+  addMessage(label, "user");
+  const botMsg = addMessage("", "bot");
 
   const evt = new EventSourcePolyfill("/api/chat-stream", {
+    method: "POST",
     headers: { "Content-Type": "application/json" },
-    payload: JSON.stringify({ prompt: text })
+    payload: JSON.stringify({ type })
   });
 
   evt.onmessage = e => {
-    aiBox.textContent += e.data;
+    botMsg.textContent += e.data;
     chat.scrollTop = chat.scrollHeight;
   };
 
-  evt.addEventListener("end", () => evt.close());
+  evt.addEventListener("done", () => evt.close());
 }
 
-/* Polyfill simples */
-function EventSourcePolyfill(url, options) {
-  const xhr = new XMLHttpRequest();
-  xhr.open("POST", url);
-  for (const h in options.headers) xhr.setRequestHeader(h, options.headers[h]);
-  xhr.send(options.payload);
+function sendPreset(type, label) {
+  stream(type, label);
+}
 
-  const es = {};
-  xhr.onprogress = () => {
-    const lines = xhr.responseText.split("\n\n");
-    const last = lines[lines.length - 1];
-    if (last.startsWith("data: ")) {
-      es.onmessage && es.onmessage({ data: last.replace("data: ", "") });
-    }
-  };
-  xhr.onload = () => es.onend && es.onend();
-  return es;
+function sendText() {
+  const val = input.value.trim();
+  if (!val) return;
+  input.value = "";
+  stream(null, val);
 }
 </script>
 
