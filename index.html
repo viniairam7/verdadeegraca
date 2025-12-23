@@ -71,6 +71,7 @@ body {
 /* INPUT FIXO */
 .input-area {
   padding: 10px 12px env(safe-area-inset-bottom);
+  margin-bottom: 12px;
   background: rgba(0,0,0,0.6);
   backdrop-filter: blur(10px);
   display: flex;
@@ -156,7 +157,7 @@ async function enviar() {
   chat.scrollTop = chat.scrollHeight;
 
   try {
-    const res = await fetch("https://verdadeegraca.onrender.com/api/rotina", {
+    const res = await fetch("https://verdadeegraca.onrender.com", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ rotina: texto })
