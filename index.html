@@ -157,7 +157,7 @@ async function enviar() {
   chat.scrollTop = chat.scrollHeight;
 
   try {
-    const res = await fetch("https://verdadeegraca.onrender.com", {
+    const res = await fetch("https://verdadeegraca.onrender.com/api/planos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ rotina: texto })
