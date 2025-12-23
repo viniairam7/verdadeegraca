@@ -2,178 +2,140 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Verdade & Graça</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0b0b0b;
+    color: #ffffff;
+  }
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: linear-gradient(180deg, #0f3d2e 0%, #071a14 60%, #000 100%);
-  color: #fff;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+  .container {
+    padding: 20px;
+    max-width: 480px;
+    margin: auto;
+  }
 
-/* HEADER */
-.header {
-  padding: 24px 20px 16px;
-  text-align: center;
-}
+  h1 {
+    text-align: center;
+    color: #d6b25e;
+    margin-bottom: 8px;
+  }
 
-.header h1 {
-  margin: 0;
-  color: #e6c97a;
-  font-weight: 600;
-}
+  .subtitle {
+    text-align: center;
+    opacity: 0.7;
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
 
-.header p {
-  margin-top: 6px;
-  font-size: 14px;
-  opacity: 0.8;
-}
+  .card {
+    background: #161616;
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
 
-/* CHAT */
-.chat {
-  flex: 1;
-  padding: 16px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
+  textarea {
+    width: 100%;
+    background: #0f0f0f;
+    border: none;
+    border-radius: 14px;
+    padding: 14px;
+    color: white;
+    font-size: 15px;
+    resize: none;
+    outline: none;
+  }
 
-/* BALÕES */
-.bot {
-  align-self: flex-start;
-  background: rgba(15, 80, 60, 0.85);
-  padding: 14px 16px;
-  border-radius: 16px;
-  max-width: 85%;
-  line-height: 1.5;
-}
+  button {
+    width: 100%;
+    margin-top: 14px;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    background: #d6b25e;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+  }
 
-.user {
-  align-self: flex-end;
-  background: linear-gradient(135deg, #e6c97a, #d6b25e);
-  color: #1b1b1b;
-  padding: 12px 16px;
-  border-radius: 16px;
-  max-width: 80%;
-  font-weight: 500;
-}
+  button:disabled {
+    opacity: 0.6;
+  }
 
-/* INPUT FIXO */
-.input-area {
-  padding: 10px 12px env(safe-area-inset-bottom);
-  margin-bottom: 80px;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(10px);
-  display: flex;
-  gap: 10px;
-}
-
-.input-area input {
-  flex: 1;
-  padding: 12px 14px;
-  border-radius: 20px;
-  border: none;
-  outline: none;
-  background: #0b2d22;
-  color: #fff;
-  font-size: 15px;
-}
-
-.input-area input::placeholder {
-  opacity: 0.6;
-}
-
-/* BOTÃO SETA */
-.send {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: none;
-  background: linear-gradient(135deg, #e6c97a, #d6b25e);
-  color: #1b1b1b;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-}
+  .response {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    font-size: 15px;
+  }
 </style>
 </head>
 
 <body>
 
-<div class="header">
+<div class="container">
   <h1>Verdade & Graça</h1>
-  <p>Um cuidado diário entre sua rotina e Deus</p>
-</div>
-
-<div class="chat" id="chat">
-  <div class="bot">
-    Quais são seus planos e horários para hoje?<br>
-    Conte como será o seu dia.
+  <div class="subtitle">
+    Um cuidado diário entre sua rotina e Deus
   </div>
-</div>
 
-<div class="input-area">
-  <input
-    id="rotina"
-    type="text"
-    placeholder="Descreva seu dia..."
-    onkeydown="if(event.key==='Enter'){enviar()}"
-  />
-  <button class="send" onclick="enviar()">➤</button>
+  <div class="card">
+    <p>
+      Quais são seus planos e horários para hoje?
+      Conte como será o seu dia.
+    </p>
+
+    <textarea
+      id="rotina"
+      rows="6"
+      placeholder="Ex: trabalho às 10h, estudo à noite, descanso em família..."
+    ></textarea>
+
+    <button id="btn" onclick="enviar()">Refletir meu dia</button>
+  </div>
+
+  <div class="card response" id="resposta"></div>
 </div>
 
 <script>
 async function enviar() {
-  const input = document.getElementById("rotina");
-  const chat = document.getElementById("chat");
-  const texto = input.value.trim();
+  const texto = document.getElementById("rotina").value.trim();
+  const respostaDiv = document.getElementById("resposta");
+  const botao = document.getElementById("btn");
 
   if (!texto) return;
 
-  // Mensagem do usuário
-  const userMsg = document.createElement("div");
-  userMsg.className = "user";
-  userMsg.textContent = texto;
-  chat.appendChild(userMsg);
-
-  input.value = "";
-  chat.scrollTop = chat.scrollHeight;
-
-  // Placeholder bot
-  const botMsg = document.createElement("div");
-  botMsg.className = "bot";
-  botMsg.textContent = "Refletindo seu dia com calma...";
-  chat.appendChild(botMsg);
-  chat.scrollTop = chat.scrollHeight;
+  respostaDiv.textContent = "Refletindo seu dia com calma...";
+  botao.disabled = true;
 
   try {
     const res = await fetch("https://verdadeegraca.onrender.com/api/planos", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rotina: texto })
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        planos: texto
+      })
     });
 
-    if (!res.ok) throw new Error("Erro no servidor");
+    if (!res.ok) {
+      throw new Error("Erro no servidor");
+    }
 
     const data = await res.json();
-    botMsg.textContent = data.resposta;
+    respostaDiv.textContent = data.resposta;
 
   } catch (err) {
-    botMsg.textContent =
+    respostaDiv.textContent =
       "Não consegui refletir agora. Tente novamente em instantes.";
+  } finally {
+    botao.disabled = false;
   }
-
-  chat.scrollTop = chat.scrollHeight;
 }
 </script>
 
