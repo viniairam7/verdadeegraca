@@ -6,65 +6,72 @@
 <title>Verdade & Graça</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #0b0b0b;
-  color: #ffffff;
-}
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0b0b0b;
+    color: #ffffff;
+  }
 
-.container {
-  padding: 20px;
-  max-width: 480px;
-  margin: auto;
-}
+  .container {
+    padding: 20px;
+    max-width: 480px;
+    margin: auto;
+  }
 
-h1 {
-  text-align: center;
-  color: #d6b25e;
-  margin-bottom: 8px;
-}
+  h1 {
+    text-align: center;
+    color: #d6b25e;
+    margin-bottom: 8px;
+  }
 
-.subtitle {
-  text-align: center;
-  opacity: 0.7;
-  font-size: 14px;
-  margin-bottom: 24px;
-}
+  .subtitle {
+    text-align: center;
+    opacity: 0.7;
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
 
-.card {
-  background: #161616;
-  border-radius: 18px;
-  padding: 16px;
-  margin-bottom: 20px;
-}
+  .card {
+    background: #161616;
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
 
-textarea {
-  width: 100%;
-  background: #0f0f0f;
-  border: none;
-  border-radius: 14px;
-  padding: 14px;
-  color: white;
-  font-size: 15px;
-  resize: none;
-}
+  textarea {
+    width: 100%;
+    background: #0f0f0f;
+    border: none;
+    border-radius: 14px;
+    padding: 14px;
+    color: white;
+    font-size: 15px;
+    resize: none;
+    outline: none;
+  }
 
-button {
-  width: 100%;
-  margin-top: 14px;
-  padding: 14px;
-  border-radius: 14px;
-  border: none;
-  background: #d6b25e;
-  font-size: 16px;
-  font-weight: 500;
-}
+  button {
+    width: 100%;
+    margin-top: 14px;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    background: #d6b25e;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+  }
 
-.response {
-  white-space: pre-wrap;
-  line-height: 1.6;
-}
+  button:disabled {
+    opacity: 0.6;
+  }
+
+  .response {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    font-size: 15px;
+  }
 </style>
 </head>
 
@@ -82,10 +89,13 @@ button {
       Conte como será o seu dia.
     </p>
 
-    <textarea id="rotina" rows="6"
-      placeholder="Ex: acordo às 6h, trabalho das 8h às 17h, estudo à noite..."></textarea>
+    <textarea
+      id="rotina"
+      rows="6"
+      placeholder="Ex: trabalho às 10h, estudo à noite, descanso em família..."
+    ></textarea>
 
-    <button onclick="enviar()">Refletir meu dia</button>
+    <button id="btn" onclick="enviar()">Refletir meu dia</button>
   </div>
 
   <div class="card response" id="resposta"></div>
@@ -95,16 +105,22 @@ button {
 async function enviar() {
   const texto = document.getElementById("rotina").value.trim();
   const respostaDiv = document.getElementById("resposta");
+  const botao = document.getElementById("btn");
 
   if (!texto) return;
 
   respostaDiv.textContent = "Refletindo seu dia com calma...";
+  botao.disabled = true;
 
   try {
-    const res = await fetch("/api/rotina", {
+    const res = await fetch("https://verdadeegraca.onrender.com/api/planos", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rotina: texto })
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        planos: texto
+      })
     });
 
     if (!res.ok) {
@@ -117,6 +133,8 @@ async function enviar() {
   } catch (err) {
     respostaDiv.textContent =
       "Não consegui refletir agora. Tente novamente em instantes.";
+  } finally {
+    botao.disabled = false;
   }
 }
 </script>
